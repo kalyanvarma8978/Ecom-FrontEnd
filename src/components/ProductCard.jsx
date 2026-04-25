@@ -20,11 +20,11 @@ const ProductCard = ({ product }) => {
       <button
         onClick={(e) => {
           e.stopPropagation();
-          addToCart(product.id);
+          navigate(`/product/${product.slug}`);
         }}
         className="mt-3 w-full bg-blue-500 text-white py-2 rounded cursor-pointer"
       >
-        Add to Cart
+        View Product
       </button>
     </div>
   );

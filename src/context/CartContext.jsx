@@ -8,15 +8,32 @@ export const CartProvider = ({ children }) => {
 
   const addToCart = async (productId) => {
     try {
-      await api.post("/cart/items/", {
-        product: productId,
-        quantity: 1,
-      });
-      setCart((prev)=>[...prev,productId])
+      const token = localStorage.getItem("token");
+      console.log("TOKEN USED:", token);
+      console.log("Sending productId:", productId);
 
-      console.log("Added to cart");
+      const res = await api.post(
+        "/cart/items/",
+        {
+          product_id: productId, // 🔥 FIXED KEY
+          quantity: 1,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+        
+      );
+
+      console.log("API RESPONSE:", res.data);
+
+      setCart((prev) => [...prev, productId]);
+
+      console.log("Added to cart ✅");
+
     } catch (err) {
-      console.error(err.response?.data || err.message);
+      console.log("ERROR:", err.response?.data); // 🔥 IMPORTANT DEBUG
     }
   };
 
