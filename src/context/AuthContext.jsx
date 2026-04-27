@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 import api from "../services/api";
 
 const AuthContext = createContext();
@@ -6,44 +6,33 @@ const AuthContext = createContext();
 export const AuthProvider = ({ children }) => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
-  // 🔥 check token on app load
+  // 🔥 Check token on refresh
   useEffect(() => {
     const token = localStorage.getItem("token");
-    if (token) {
-      setIsLoggedIn(true);
-    }
+    if (token) setIsLoggedIn(true);
   }, []);
 
-const login = async (email, password) => {
-  try {
-    const res = await api.post("/auth/login/", {
-      email,
-      password,
-    });
+  const login = async (email, password) => {
+    try {
+      const res = await api.post("/auth/login/", { email, password });
 
-    console.log("LOGIN RESPONSE:", res.data); // 👈 IMPORTANT
-
-    // 🔥 store token safely
-    if (res.data.access) {
       localStorage.setItem("token", res.data.access);
-    } else if (res.data.token) {
-      localStorage.setItem("token", res.data.token);
-    } else {
-      console.log("No token found in response ❌");
+      setIsLoggedIn(true);
+    } catch (err) {
+      console.error(err.response?.data || err.message);
     }
+  };
 
-    setIsLoggedIn(true);
-
-  } catch (error) {
-    console.error("LOGIN ERROR:", error.response?.data || error.message);
-  }
-};
+  const logout = () => {
+    localStorage.removeItem("token");
+    setIsLoggedIn(false);
+  };
 
   return (
-    <AuthContext.Provider value={{ isLoggedIn, login }}>
+    <AuthContext.Provider value={{ isLoggedIn, login, logout }}>
       {children}
     </AuthContext.Provider>
   );
 };
 
-export const useAuth = () => useContext(AuthContext); 
+export const useAuth = () => useContext(AuthContext);
