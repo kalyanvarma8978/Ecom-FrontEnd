@@ -1,38 +1,31 @@
-import { createContext, useContext, useEffect, useState } from "react";
-import api from "../services/api";
-
-const AuthContext = createContext();
+import { createContext, useEffect, useState } from "react";
+import Cookies from "js-cookie";
+export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
-  // 🔥 Check token on refresh
-  useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (token) setIsLoggedIn(true);
-  }, []);
+    const [isAuthenticated, setIsAuthenticated] = useState(false);
 
-  const login = async (email, password) => {
-    try {
-      const res = await api.post("/auth/login/", { email, password });
+    useEffect(() => {
+        const token = Cookies.get("access");
+        if (token) {
+            setIsAuthenticated(true);
+        }
+    }, [])
 
-      localStorage.setItem("token", res.data.access);
-      setIsLoggedIn(true);
-    } catch (err) {
-      console.error(err.response?.data || err.message);
+
+    const logout=()=>{
+        Cookies.remove("access");
+        Cookies.remove("refresh");
+        setIsAuthenticated(false);
     }
-  };
+    return (
+        <AuthContext.Provider value={{
+            isAuthenticated, setIsAuthenticated,logout
+        }}>
+            {children}
+        </AuthContext.Provider>
 
-  const logout = () => {
-    localStorage.removeItem("token");
-    setIsLoggedIn(false);
-  };
+    );
 
-  return (
-    <AuthContext.Provider value={{ isLoggedIn, login, logout }}>
-      {children}
-    </AuthContext.Provider>
-  );
 };
-
-export const useAuth = () => useContext(AuthContext);

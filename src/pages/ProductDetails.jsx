@@ -1,118 +1,78 @@
-import { useParams } from "react-router-dom";
-import { useEffect, useState } from "react";
-import api from "../services/api";
-import { useCart } from "../context/CartContext";
-import LoginModal from "../components/AuthModel";
+import React, { useContext, useEffect, useState } from 'react'
+import { useParams } from 'react-router-dom'
+import api from '../api/axios'
+import { CartContext } from '../context/CartContext'
 
 const ProductDetails = () => {
-  const { slug } = useParams();
+    const {slug}= useParams()
+    const [product,setProduct]=useState(null)
+    const [quantity,setQuantity]=useState(1);
+    const {addToCart}=useContext(CartContext);
 
-  const [product, setProduct] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [showLogin, setShowLogin] = useState(false);
-  const [pendingProduct, setPendingProduct] = useState(null);
+    useEffect(()=>{
+        const fetchProduct = async () => {
+            try {
+                console.log(slug)
+                const res= await api.get(`/catalog/products/${slug}/`)
+                setProduct(res.data)
+                console.log(product)
+            } catch (error) {
+                console.log(error)
+            }
+        }
+        fetchProduct();
+    },[slug])
 
-  const { addToCart } = useCart();
-
-  // 🔥 Fetch product
-  useEffect(() => {
-    const fetchProduct = async () => {
-      try {
-        const res = await api.get(`/catalog/products/${slug}/`);
-        setProduct(res.data);
-      } catch (err) {
-        console.error(err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchProduct();
-  }, [slug]);
-
-  // 🔥 Handle Add to Cart
-  const handleAddToCart = () => {
-    const token = localStorage.getItem("token");
-
-    if (!token) {
-      setPendingProduct(product.id); // remember product
-      setShowLogin(true); // open modal
-      return;
+    if(!product){
+        return <h1>Loading...</h1>
     }
 
-    addToCart(product.id);
-  };
+    return (
 
-  if (loading) {
-    return <p className="text-center mt-10">Loading...</p>;
-  }
-
-  if (!product) {
-    return <p className="text-center mt-10">Product not found</p>;
-  }
-
-  return (
-    <div className="max-w-5xl mx-auto bg-white rounded-lg shadow-md overflow-hidden p-6">
-      <div className="grid md:grid-cols-2 gap-8 items-stretch">
-
-        {/* Image */}
-        <div className="w-full aspect-[4/3] overflow-hidden rounded-lg">
-          <img
-            src={
-              product.images?.[0]?.image ||
-              "https://via.placeholder.com/400"
-            }
-            alt={product.name}
-            className="w-full h-full object-cover"
-          />
-        </div>
-
-        {/* Content */}
-        <div className="flex flex-col h-full">
-
-          {/* Top */}
-          <div>
-            <h1 className="text-2xl md:text-3xl font-bold line-clamp-2">
-              {product.name}
-            </h1>
-
-            <p className="text-gray-600 mt-4">
-              {product.description || "No description available"}
-            </p>
-          </div>
-
-          {/* Bottom */}
-          <div className="mt-auto flex items-center justify-between pt-6">
-            <p className="text-2xl font-bold text-blue-500">
-              ₹{Number(product.price)}
-            </p>
-
-            <button
-              onClick={handleAddToCart}
-              className="bg-blue-500 text-white px-6 py-2 rounded hover:bg-blue-600 transition"
-            >
-              Add to Cart
-            </button>
-          </div>
+        <div className='max-w-7xl mx-auto p-6'>
+            
+            <div className='grid md:grid-cols-2 gap-10'>
+                <div
+                className='bg-white rounded-2xl shadow-sm p-6 flex items-center justify-center'
+                >
+                    <img
+                    src={product.images[0]?.image}
+                    alt={product.name}
+                    className='w-full max-h-[500px] object-contain'
+                    />
+                </div>
+                <div >
+                <h1 className='text-3xl font-bold text-gray-900 leading-tight'>{product.name}</h1>
+                <p className='text-4xl font-bold text-blue-600 mt-6'> ₹ {product.price}</p> 
+                <p className='text-gray-600 mt-6 leading-relaxed'>{product.description}</p>  
+                <p className='mt-6 text-green-600 font-semibold'>In Stock: {product.stock}</p>
+                <div className='flex items-center gap-4 mt-8'>
+                    <button onClick={()=>
+                        quantity>1 &&setQuantity(quantity-1)
+                    }
+                    className='w-10 h-10 rounded-lg border text-xl font-bold hover:bg-gray-100'>-</button>
+                    <span className='text-xl font-semibold'>{quantity}</span>
+                    <button
+                    onClick={()=>
+                        setQuantity(quantity+1)
+                    } 
+                    className='w-10 h-10 rounded-lg border text-xl font-bold hover:bg-gray-100'
+                    >+</button>
+                </div>      
+                <div className='flex gap-4 mt-8'>
+                    <button onClick={() => addToCart(product, quantity)}
+                    className='flex-1 bg-blue-600 hover:bg-blue-700 text-white
+                     py-4 rounded-xl font-semibold transition cursor-pointer'> Add to Cart </button>
+                    <button className='flex-1 bg-black hover:bg-gray-800 text-white
+                     py-4 rounded-xl font-semibold transition'>Buy Now</button>
+                </div>           
+                </div>
+            </div>
 
         </div>
-      </div>
 
-      {/* 🔥 Login Modal */}
-      <LoginModal
-        isOpen={showLogin}
-        onClose={() => {
-          setShowLogin(false);
+    )
 
-          // 🔥 Auto add after login
-          if (pendingProduct) {
-            addToCart(pendingProduct);
-            setPendingProduct(null);
-          }
-        }}
-      />
-    </div>
-  );
-};
+}
 
-export default ProductDetails;
+export default ProductDetails

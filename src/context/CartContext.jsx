@@ -1,49 +1,93 @@
-import { createContext, useContext, useState } from "react";
-import api from "../services/api";
+import { createContext, useState, useEffect } from "react";
 
-const CartContext = createContext();
+export const CartContext = createContext();
 
 export const CartProvider = ({ children }) => {
-  const [cart, setCart] = useState([]);
 
-  const addToCart = async (productId) => {
-    try {
-      const token = localStorage.getItem("token");
-      console.log("TOKEN USED:", token);
-      console.log("Sending productId:", productId);
+    const [cartItems, setCartItems] = useState([]);
 
-      const res = await api.post(
-        "/cart/items/",
-        {
-          product_id: productId, // 🔥 FIXED KEY
-          quantity: 1,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+    const addToCart = (product, quantity) => {
+
+        /* Check Existing Product */
+        const existingItem = cartItems.find(
+            (item) => item.product.id === product.id
+        );
+
+        /* If Product Already Exists */
+        if (existingItem) {
+
+            const updatedCart = cartItems.map((item) =>
+
+                item.product.id === product.id
+
+                    ? {
+                        ...item,
+                        quantity: item.quantity + quantity
+                    }
+
+                    : item
+
+            );
+
+            setCartItems(updatedCart);
+
         }
-        
-      );
 
-      console.log("API RESPONSE:", res.data);
+        /* Add New Product */
+        else {
 
-      setCart((prev) => [...prev, productId]);
+            setCartItems([
+                ...cartItems,
+                {
+                    product,
+                    quantity
+                }
+            ]);
 
-      console.log("Added to cart ✅");
+        }
 
-    } catch (err) {
-      console.log("ERROR:", err.response?.data); // 🔥 IMPORTANT DEBUG
-    }
-  };
+    };
 
-  return (
-    <CartContext.Provider value={{ cart, addToCart }}>
-      {children}
-    </CartContext.Provider>
-  );
+    const removeFromCart = (productId)=>{
+        const updatedCart =cartItems.filter(
+            (item)=>item.product.id!==productId
+        );
+
+        setCartItems(updatedCart)
+    };
+
+    const updateQuantity = (productId, newQuantity) =>{
+        const updatedCart = cartItems.map((item)=>
+        item.product.id===productId ?
+        {
+            ...item,
+            quantity:newQuantity
+        } : item
+    );
+    setCartItems(updatedCart)
+    } 
+
+    useEffect(() => {
+
+        console.log(cartItems);
+
+    }, [cartItems]);
+
+    return (
+
+        <CartContext.Provider
+            value={{
+                cartItems,
+                addToCart,
+                removeFromCart,
+                updateQuantity
+            }}
+        >
+
+            {children}
+
+        </CartContext.Provider>
+
+    );
+
 };
-
-export default CartContext;
-
-export const useCart = () => useContext(CartContext);
