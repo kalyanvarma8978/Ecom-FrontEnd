@@ -5,14 +5,14 @@ const api=axios.create({
     withCredentials:true,
 })
 
-// api.interceptors.request.use(
-//     (config)=>{
-//         const accessToken=Cookies.get('access');
-//         if(accessToken){
-//             config.headers.Authorization=`Bearer ${accessToken}`
-//         }
-//         return config;
-//     },
-//     (error) => Promise.reject(error)
-// )
+api.interceptors.request.use(
+    (config)=>{
+        const accessToken=Cookies.get('access');
+        if(accessToken){
+            config.headers.Authorization=`Bearer ${accessToken}`
+        }
+        return config;
+    },
+    (error) => Promise.reject(error)
+)
 export default api;

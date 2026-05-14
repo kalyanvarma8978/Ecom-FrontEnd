@@ -1,9 +1,34 @@
-import React from 'react'
+import React, { useContext } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { CartContext } from '../context/CartContext'
+import { AuthContext } from '../context/AuthContext'
 
 const ProductCard = ({ product }) => {
 
-    const navigate = useNavigate()
+    const navigate = useNavigate();
+
+    const { addToCart } = useContext(CartContext);
+
+    const { isAuthenticated } = useContext(AuthContext);
+
+    const handleAddToCart = async (e) => {
+
+        // Prevent Product Navigation
+        e.stopPropagation();
+
+        // Redirect if not logged in
+        if (!isAuthenticated) {
+
+            navigate("/signin");
+
+            return;
+
+        }
+
+        // Add Product To Cart
+        await addToCart(product.id, 1);
+
+    };
 
     return (
 
@@ -63,8 +88,9 @@ const ProductCard = ({ product }) => {
                     ₹ {product.price}
                 </p>
 
-                {/* Button */}
+                {/* Add To Cart Button */}
                 <button
+                    onClick={handleAddToCart}
                     className='
                         w-full
                         mt-4
