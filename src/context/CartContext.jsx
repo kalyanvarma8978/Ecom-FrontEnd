@@ -1,4 +1,5 @@
 import { createContext, useState, useEffect } from "react";
+import Cookies from "js-cookie";
 import api from "../api/axios";
 
 export const CartContext = createContext();
@@ -18,7 +19,11 @@ export const CartProvider = ({ children }) => {
 
         } catch (error) {
 
-            console.log(error);
+            if (error.response?.status !== 401) {
+
+                console.log(error);
+
+            }
 
         }
 
@@ -38,7 +43,11 @@ export const CartProvider = ({ children }) => {
 
         } catch (error) {
 
-            console.log(error);
+            if (error.response?.status !== 401) {
+
+                console.log(error);
+
+            }
 
         }
 
@@ -57,7 +66,11 @@ export const CartProvider = ({ children }) => {
 
         } catch (error) {
 
-            console.log(error);
+            if (error.response?.status !== 401) {
+
+                console.log(error);
+
+            }
 
         }
 
@@ -74,15 +87,26 @@ export const CartProvider = ({ children }) => {
 
         } catch (error) {
 
-            console.log(error);
+            if (error.response?.status !== 401) {
+
+                console.log(error);
+
+            }
 
         }
 
     };
 
+    // Initial Cart Fetch
     useEffect(() => {
 
-        fetchCart();
+        const accessToken = Cookies.get("access");
+
+        if (accessToken) {
+
+            fetchCart();
+
+        }
 
     }, []);
 
@@ -91,6 +115,7 @@ export const CartProvider = ({ children }) => {
         <CartContext.Provider
             value={{
                 cartItems,
+                fetchCart,
                 addToCart,
                 updateQuantity,
                 removeFromCart

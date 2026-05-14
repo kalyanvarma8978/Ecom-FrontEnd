@@ -23,7 +23,7 @@ const Signin = () => {
             Cookies.set("access",res.data.access);
             Cookies.set("refresh",res.data.refresh)
             setIsAuthenticated(true)
-            navigate("/navbar")
+            navigate("/")
 
             console.log(res.data);
         } catch (error) {

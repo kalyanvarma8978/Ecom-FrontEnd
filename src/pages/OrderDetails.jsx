@@ -1,119 +1,175 @@
-// import React, { useEffect, useState } from "react";
-// import { useParams } from "react-router-dom";
-// import api from "../services/api";
+import React, { useEffect, useState } from 'react'
+import { useParams } from 'react-router-dom'
+import api from '../api/axios'
 
-// const OrderDetails = () => {
-//   const { id } = useParams();
+const OrderDetails = () => {
 
-//   const [order, setOrder] = useState(null);
-//   const [loading, setLoading] = useState(true);
+    const { id } = useParams();
 
-//   const fetchOrder = async () => {
-//     try {
-//       const res = await api.get(`/orders/${id}/`);
-//       setOrder(res.data);
-//     } catch (err) {
-//       console.error(err);
-//     } finally {
-//       setLoading(false);
-//     }
-//   };
+    const [order, setOrder] = useState(null);
 
-//   useEffect(() => {
-//     fetchOrder();
-//   }, [id]);
+    // Fetch Single Order
+    const fetchOrder = async () => {
 
-//   // Loading
-//   if (loading)
-//     return <p className="text-center mt-10">Loading...</p>;
+        try {
 
-//   // Error
-//   if (!order)
-//     return <p className="text-center mt-10">Order not found</p>;
+            const res = await api.get(`/orders/${id}/`);
 
-//   // 🔥 Steps (DO NOT include cancelled)
-//   const steps = ["Placed", "Packed", "Shipped", "Delivered"];
+            setOrder(res.data);
 
-//   // 🔥 FIXED STATUS HANDLING
-//   const getCurrentStep = (status) => {
-//     const normalized = status?.toLowerCase().trim();
+            console.log(res.data);
 
-//     switch (normalized) {
-//       case "pending":
-//         return 0;
-//       case "processing":
-//         return 1;
-//       case "shipped":
-//         return 2;
-//       case "delivered":
-//         return 3;
-//       case "cancelled":
-//         return -1;
-//       default:
-//         return 0;
-//     }
-//   };
+        } catch (error) {
 
-//   const currentStep = getCurrentStep(order.status);
+            console.log(error);
 
-//   return (
-//     <div className="p-4 max-w-3xl mx-auto">
-//       <h1 className="text-xl font-bold mb-4">Order Details</h1>
+        }
 
-//       {/* Order Info */}
-//       <div className="border p-4 rounded mb-4">
-//         <p><b>Order ID:</b> {order.id}</p>
-//         <p><b>Status:</b> {order.status}</p>
-//         <p><b>Total:</b> ₹{order.total_price}</p>
-//       </div>
+    };
 
-//       {/* 🔥 TRACKING */}
-//       {order.status?.toLowerCase().trim() === "cancelled" ? (
-//         <div className="bg-red-100 text-red-600 p-4 rounded mb-4 text-center font-semibold">
-//           Order Cancelled ❌
-//         </div>
-//       ) : (
-//         <div className="flex items-center justify-between mb-6">
-//           {steps.map((step, index) => (
-//             <div key={index} className="flex-1 text-center">
+    useEffect(() => {
 
-//               {/* Circle */}
-//               <div
-//                 className={`w-8 h-8 mx-auto rounded-full flex items-center justify-center text-white ${
-//                   index <= currentStep ? "bg-green-500" : "bg-gray-300"
-//                 }`}
-//               >
-//                 {index + 1}
-//               </div>
+        fetchOrder();
 
-//               {/* Label */}
-//               <p className="text-sm mt-2">{step}</p>
+    }, []);
 
-//               {/* Line */}
-//               {index < steps.length - 1 && (
-//                 <div
-//                   className={`h-1 mt-2 ${
-//                     index < currentStep ? "bg-green-500" : "bg-gray-300"
-//                   }`}
-//                 ></div>
-//               )}
-//             </div>
-//           ))}
-//         </div>
-//       )}
+    // Loading State
+    if (!order) {
 
-//       {/* Items */}
-//       <h2 className="font-semibold mb-2">Items</h2>
+        return (
 
-//       {order.items?.map((item) => (
-//         <div key={item.id} className="border p-3 mb-2 rounded">
-//           <p>{item.product_name}</p>
-//           <p>Qty: {item.quantity}</p>
-//           <p>₹{item.price}</p>
-//         </div>
-//       ))}
-//     </div>
-//   );
-// };
+            <h1 className='p-6 text-xl font-semibold'>
+                Loading...
+            </h1>
 
-// export default OrderDetails;
+        );
+
+    }
+
+    return (
+
+        <div className='max-w-5xl mx-auto p-6'>
+
+            {/* Header */}
+            <div className='flex justify-between items-center mb-8'>
+
+                <div>
+
+                    <h1 className='text-3xl font-bold'>
+                        Order #{order.id}
+                    </h1>
+
+                    <p className='text-gray-500 mt-2'>
+                        {
+                            new Date(
+                                order.created_at
+                            ).toLocaleDateString()
+                        }
+                    </p>
+
+                </div>
+
+                <span className='capitalize bg-gray-100 px-4 py-2 rounded-full font-medium'>
+                    {order.status}
+                </span>
+
+            </div>
+
+            {/* Shipping Address */}
+            <div className='border rounded-xl p-6 mb-6'>
+
+                <h2 className='text-2xl font-semibold mb-4'>
+                    Shipping Address
+                </h2>
+
+                <p className='text-gray-700 whitespace-pre-line'>
+                    {order.shipping_address}
+                </p>
+
+            </div>
+
+            {/* Ordered Products */}
+            <div className='border rounded-xl p-6 mb-6'>
+
+                <h2 className='text-2xl font-semibold mb-6'>
+                    Ordered Products
+                </h2>
+
+                {
+                    order.items.map((item) => (
+
+                        <div
+                            key={item.id}
+                            className='flex justify-between items-center border-b pb-4 mb-4'
+                        >
+
+                            <div>
+
+                                <h3 className='font-semibold text-lg'>
+                                    {item.product_name}
+                                </h3>
+
+                                <p className='text-gray-500'>
+                                    Quantity: {item.quantity}
+                                </p>
+
+                            </div>
+
+                            <p className='font-bold text-blue-600'>
+                                ₹ {item.price}
+                            </p>
+
+                        </div>
+
+                    ))
+                }
+
+            </div>
+
+            {/* Payment Details */}
+            <div className='border rounded-xl p-6 mb-6'>
+
+                <h2 className='text-2xl font-semibold mb-4'>
+                    Payment Details
+                </h2>
+
+                <div className='space-y-3'>
+
+                    <p>
+                        <span className='font-semibold'>
+                            Method:
+                        </span>{" "}
+                        {order.payment?.method}
+                    </p>
+
+                    <p>
+                        <span className='font-semibold'>
+                            Payment Status:
+                        </span>{" "}
+                        {order.payment?.status}
+                    </p>
+
+                </div>
+
+            </div>
+
+            {/* Total */}
+            <div className='border rounded-xl p-6 flex justify-between items-center'>
+
+                <h2 className='text-2xl font-bold'>
+                    Total Amount
+                </h2>
+
+                <p className='text-3xl font-bold text-blue-600'>
+                    ₹ {order.total_amount}
+                </p>
+
+            </div>
+
+        </div>
+
+    )
+
+}
+
+export default OrderDetails

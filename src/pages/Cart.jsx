@@ -1,7 +1,10 @@
 import React, { useContext } from 'react'
 import { CartContext } from '../context/CartContext'
+import { useNavigate } from 'react-router-dom'
 
 const Cart = () => {
+
+    const navigate=useNavigate();
 
     const {
         cartItems,
@@ -107,6 +110,7 @@ const Cart = () => {
                             </h2>
 
                             <button
+                            onClick={()=>navigate("/checkout")}
                                 className='bg-black text-white px-6 py-3 rounded-lg hover:bg-gray-800 transition'
                             >
                                 Proceed to Checkout

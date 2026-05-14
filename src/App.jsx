@@ -9,10 +9,10 @@ import ProtectedRoute from './components/ProtectedRoute'
 import Navbar from './components/Navbar'
 import ProductDetails from './pages/ProductDetails'
 import Cart from './pages/Cart'
-
-const Dashboard = () => {
-  return <h1 className='text-3xl font-bold p-6'>Dashboard Page</h1>
-}
+import Checkout from './pages/Checkout'
+import OrderSuccess from './pages/OrderSuccess'
+import Orders from './pages/Orders'
+import OrderDetails from './pages/OrderDetails'
 
 const App = () => {
 
@@ -24,7 +24,8 @@ const App = () => {
     <div>
 
       {/* Global Navbar */}
-      <Navbar searchQuery={searchQuery}
+      <Navbar
+        searchQuery={searchQuery}
         setSearchQuery={setSearchQuery}
       />
 
@@ -33,42 +34,78 @@ const App = () => {
 
         {/* Home Page */}
         <Route
-
           path="/"
-          element={<Home searchQuery={searchQuery}
-            selectedCategory={selectedCategory}
-            setSelectedCategory={setSelectedCategory} />}
+          element={
+            <Home
+              searchQuery={searchQuery}
+              selectedCategory={selectedCategory}
+              setSelectedCategory={setSelectedCategory}
+            />
+          }
         />
 
-        {/* Signup Page */}
+        {/* Signup */}
         <Route
           path="/signup"
           element={<Signup />}
         />
 
-        {/* Signin Page */}
+        {/* Signin */}
         <Route
           path="/signin"
           element={<Signin />}
         />
 
+        {/* Product Details */}
         <Route
-        path='/product/:slug'
-        element={<ProductDetails/>}
-        />
-        <Route
-        path='/cart'
-        element={<Cart/>}
+          path='/product/:slug'
+          element={<ProductDetails />}
         />
 
-        {/* Protected Dashboard */}
+        {/* Protected Cart */}
         <Route
-          path="/dashboard"
+          path='/cart'
           element={
             <ProtectedRoute>
+              <Cart />
+            </ProtectedRoute>
+          }
+        />
 
-              <Dashboard />
+        {/* Protected Checkout */}
+        <Route
+          path='/checkout'
+          element={
+            <ProtectedRoute>
+              <Checkout />
+            </ProtectedRoute>
+          }
+        />
 
+        {/* Protected Order Success */}
+        <Route
+          path='/order-success'
+          element={
+            <ProtectedRoute>
+              <OrderSuccess />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path='/orders'
+          element={
+            <ProtectedRoute>
+              <Orders />
+            </ProtectedRoute>
+          }
+
+        />
+        <Route
+          path='/orders/:id'
+          element={
+            <ProtectedRoute>
+              <OrderDetails />
             </ProtectedRoute>
           }
         />
