@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import api from '../api/axios'
 import ProductCard from '../components/ProductCard'
+import ProductCardSkeleton from '../components/skeletons/ProductCardSkeleton'
 
 const Home = ({
     searchQuery,
@@ -10,6 +11,7 @@ const Home = ({
 
     const [products, setProducts] = useState([])
     const [categories, setCategories] = useState([])
+    const [loading, setLoading] = useState(true)
 
     useEffect(() => {
 
@@ -22,9 +24,13 @@ const Home = ({
 
                 setProducts(res.data.results)
 
+                setLoading(false)
+
             } catch (error) {
 
                 console.error(error)
+
+                setLoading(false)
 
             }
 
@@ -55,13 +61,11 @@ const Home = ({
     /* Search + Category Filtering */
     const filteredProducts = products.filter((product) => {
 
-        /* Search Match */
         const matchesSearch =
             product.name
                 .toLowerCase()
                 .includes(searchQuery.toLowerCase())
 
-        /* Category Match */
         const matchesCategory =
             selectedCategory === "All"
                 ? true
@@ -73,198 +77,284 @@ const Home = ({
 
     return (
 
-        <div
-            className='
-                flex
-                flex-col
-                md:flex-row
-                gap-8
-                p-4
-                md:p-6
-            '
-        >
+        <div className='bg-gray-50 min-h-screen'>
 
-            {/* Sidebar */}
-            <div
-                className='
-                    hidden
-                    md:flex
-                    flex-col
-                    md:w-64
-                    w-full
-                    gap-4
-                    h-fit
-                    sticky
-                    top-24
-                    bg-white
-                    p-5
-                    rounded-2xl
-                    shadow-sm
-                    border
-                    border-gray-100
-                '
-            >
+            <div className='max-w-7xl mx-auto px-4 md:px-6 py-8'>
 
-                <h2 className='text-2xl font-bold mb-2'>
-                    Categories
-                </h2>
-
-                {/* All Button */}
-                <button
-                    onClick={() => setSelectedCategory("All")}
-                    className={`
-                        text-left
-                        px-5
-                        py-3
-                        rounded-xl
-                        border
-                        transition
-                        duration-300
-
-                        ${selectedCategory === "All"
-                            ? "bg-blue-600 text-white border-blue-600"
-                            : "bg-white text-gray-700 border-gray-300 hover:bg-gray-100"
-                        }
-                    `}
-                >
-
-                    All
-
-                </button>
-
-                {/* Dynamic Categories */}
-                {
-
-                    categories?.map((category) => (
-
-                        <button
-                            key={category.id}
-                            onClick={() => setSelectedCategory(category.id)}
-                            className={`
-                                text-left
-                                px-5
-                                py-3
-                                rounded-xl
-                                border
-                                transition
-                                duration-300
-
-                                ${selectedCategory === category.id
-                                    ? "bg-blue-600 text-white border-blue-600"
-                                    : "bg-white text-gray-700 border-gray-300 hover:bg-gray-100"
-                                }
-                            `}
-                        >
-
-                            {category.name}
-
-                        </button>
-
-                    ))
-
-                }
-
-            </div>
-
-            {/* Products Section */}
-            <div className='flex-1'>
-
-                {/* Heading */}
-                <h1 className='text-3xl font-bold mb-8'>
-                    Latest Products
-                </h1>
-
-                {/* Mobile Categories */}
+                {/* Hero Section */}
                 <div
                     className='
-                        md:hidden
-                        flex
-                        gap-3
-                        overflow-x-auto
-                        mb-6
-                        pb-2
+                        relative
+                        overflow-hidden
+                        rounded-[32px]
+                        bg-gradient-to-r
+                        from-black
+                        to-gray-900
+                        mb-16
                     '
                 >
 
-                    {/* All Button */}
-                    <button
-                        onClick={() => setSelectedCategory("All")}
-                        className={`
-                            whitespace-nowrap
-                            px-4
-                            py-2
+                    {/* Glow Effect */}
+                    <div
+                        className='
+                            absolute
+                            w-96
+                            h-96
+                            bg-white/5
                             rounded-full
-                            border
+                            blur-3xl
+                            -top-20
+                            -right-20
+                        '
+                    ></div>
 
-                            ${selectedCategory === "All"
-                                ? "bg-blue-600 text-white border-blue-600"
-                                : "bg-white border-gray-300"
-                            }
-                        `}
+                    <div
+                        className='
+                            relative
+                            flex
+                            flex-col
+                            items-center
+                            justify-center
+                            text-center
+                            py-20
+                            md:py-28
+                            px-6
+                        '
                     >
 
-                        All
+                        {/* Small Text */}
+                        <p
+                            className='
+                                text-gray-400
+                                uppercase
+                                tracking-[4px]
+                                text-xs
+                                md:text-sm
+                                mb-6
+                            '
+                        >
+                            Minimal Modern Ecommerce
+                        </p>
 
-                    </button>
+                        {/* Heading */}
+                        <h1
+                            className='
+                                text-4xl
+                                sm:text-5xl
+                                md:text-7xl
+                                font-bold
+                                text-white
+                                leading-tight
+                                max-w-5xl
+                            '
+                        >
+                            Discover Premium Products For Modern Living
+                        </h1>
 
-                    {/* Dynamic Categories */}
-                    {
+                        {/* Description */}
+                        <p
+                            className='
+                                text-gray-400
+                                mt-8
+                                text-base
+                                md:text-lg
+                                leading-relaxed
+                                max-w-2xl
+                            '
+                        >
+                            Explore curated collections designed with simplicity,
+                            elegance, and everyday comfort in mind.
+                        </p>
 
-                        categories?.map((category) => (
+                        {/* Buttons */}
+                        <div
+                            className='
+                                flex
+                                flex-wrap
+                                justify-center
+                                gap-4
+                                mt-10
+                            '
+                        >
 
                             <button
-                                key={category.id}
-                                onClick={() => setSelectedCategory(category.id)}
-                                className={`
-                                    whitespace-nowrap
-                                    px-4
-                                    py-2
-                                    rounded-full
-                                    border
-
-                                    ${selectedCategory === category.id
-                                        ? "bg-blue-600 text-white border-blue-600"
-                                        : "bg-white border-gray-300"
-                                    }
-                                `}
+                                className='
+                                    bg-white
+                                    text-black
+                                    px-7
+                                    py-3.5
+                                    rounded-2xl
+                                    font-medium
+                                    hover:bg-gray-200
+                                    transition-all
+                                '
                             >
-
-                                {category.name}
-
+                                Shop Now
                             </button>
 
-                        ))
+                            <button
+                                className='
+                                    border
+                                    border-gray-700
+                                    text-white
+                                    px-7
+                                    py-3.5
+                                    rounded-2xl
+                                    hover:bg-white/10
+                                    transition-all
+                                '
+                            >
+                                Explore Collection
+                            </button>
 
-                    }
+                        </div>
+
+                    </div>
 
                 </div>
 
-                {/* Products Grid */}
-                <div
-                    className='
-                        grid
-                        grid-cols-1
-                        sm:grid-cols-2
-                        md:grid-cols-2
-                        lg:grid-cols-3
-                        xl:grid-cols-4
-                        2xl:grid-cols-5
-                        gap-6
-                    '
-                >
+                {/* Categories Section */}
+                <div className='mb-14'>
 
-                    {
+                    <div className='text-center mb-8'>
 
-                        filteredProducts?.map((product) => (
+                        <p className='text-gray-500 mb-2'>
+                            Browse Categories
+                        </p>
 
-                            <ProductCard
-                                key={product.id}
-                                product={product}
-                            />
+                        <h2 className='text-3xl md:text-4xl font-bold text-gray-900'>
+                            Shop By Category
+                        </h2>
 
-                        ))
+                    </div>
 
-                    }
+                    {/* Category Pills */}
+                    <div
+                        className='
+                            flex
+                            items-center
+                            justify-start
+                            md:justify-center
+                            gap-4
+                            overflow-x-auto
+                            pb-2
+                        '
+                    >
+
+                        {/* All */}
+                        <button
+                            onClick={() => setSelectedCategory("All")}
+                            className={`
+                                whitespace-nowrap
+                                px-6
+                                py-3
+                                rounded-2xl
+                                font-medium
+                                transition-all
+
+                                ${selectedCategory === "All"
+                                    ? "bg-black text-white"
+                                    : "bg-white text-gray-700 border border-gray-200 hover:bg-gray-100"
+                                }
+                            `}
+                        >
+                            All
+                        </button>
+
+                        {/* Dynamic Categories */}
+                        {
+
+                            categories?.map((category) => (
+
+                                <button
+                                    key={category.id}
+                                    onClick={() =>
+                                        setSelectedCategory(category.id)
+                                    }
+                                    className={`
+                                        whitespace-nowrap
+                                        px-6
+                                        py-3
+                                        rounded-2xl
+                                        font-medium
+                                        transition-all
+
+                                        ${selectedCategory === category.id
+                                            ? "bg-black text-white"
+                                            : "bg-white text-gray-700 border border-gray-200 hover:bg-gray-100"
+                                        }
+                                    `}
+                                >
+                                    {category.name}
+                                </button>
+
+                            ))
+
+                        }
+
+                    </div>
+
+                </div>
+
+                {/* Products Section */}
+                <div>
+
+                    {/* Heading */}
+                    <div className='mb-10 text-center'>
+
+                        <p className='text-gray-500 mb-2'>
+                            Featured Collection
+                        </p>
+
+                        <h2 className='text-3xl md:text-5xl font-bold text-gray-900'>
+                            Discover Products
+                        </h2>
+
+                        <p className='text-gray-500 mt-4 text-lg max-w-2xl mx-auto'>
+                            Carefully selected products crafted for modern lifestyles and premium everyday experiences.
+                        </p>
+
+                    </div>
+
+                    {/* Products Grid */}
+                    <div
+                        className='
+                            grid
+                            grid-cols-1
+                            sm:grid-cols-2
+                            lg:grid-cols-3
+                            xl:grid-cols-4
+                            gap-6
+                        '
+                    >
+
+                        {
+                            loading ? (
+
+                                [...Array(8)].map((_, index) => (
+
+                                    <ProductCardSkeleton
+                                        key={index}
+                                    />
+
+                                ))
+
+                            ) : (
+
+                                filteredProducts?.map((product) => (
+
+                                    <ProductCard
+                                        key={product.id}
+                                        product={product}
+                                    />
+
+                                ))
+
+                            )
+
+                        }
+
+                    </div>
 
                 </div>
 

@@ -13,6 +13,8 @@ import Checkout from './pages/Checkout'
 import OrderSuccess from './pages/OrderSuccess'
 import Orders from './pages/Orders'
 import OrderDetails from './pages/OrderDetails'
+import Profile from './pages/Profile'
+import { Toaster } from 'react-hot-toast'
 
 const App = () => {
 
@@ -28,6 +30,10 @@ const App = () => {
         searchQuery={searchQuery}
         setSearchQuery={setSearchQuery}
       />
+      <Toaster
+      position='top-center'
+      reverseOrder={false}
+       />
 
       {/* Routes */}
       <Routes>
@@ -106,6 +112,14 @@ const App = () => {
           element={
             <ProtectedRoute>
               <OrderDetails />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path='/profile'
+          element={
+            <ProtectedRoute>
+              <Profile />
             </ProtectedRoute>
           }
         />

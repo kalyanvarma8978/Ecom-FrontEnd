@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import api from '../api/axios';
 import Cookies from "js-cookie"
 import { AuthContext } from '../context/AuthContext';
+import toast from 'react-hot-toast';
 const Signin = () => {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
@@ -23,11 +24,12 @@ const Signin = () => {
             Cookies.set("access",res.data.access);
             Cookies.set("refresh",res.data.refresh)
             setIsAuthenticated(true)
+            toast.success("Login Success");
             navigate("/")
 
             console.log(res.data);
         } catch (error) {
-            console.error(error)
+            toast.error("Invalid email or password")
         }
 
         console.log(userData)

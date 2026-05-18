@@ -2,241 +2,580 @@ import React, { useContext, useState } from 'react'
 import { CartContext } from '../context/CartContext'
 import api from '../api/axios'
 import { useNavigate } from 'react-router-dom'
+import toast from 'react-hot-toast'
 
 const Checkout = () => {
 
     const { cartItems } = useContext(CartContext)
+
     const navigate = useNavigate()
+
     const [checkoutData, setCheckoutData] = useState({
+
         fullname: "",
         phone: "",
         address: "",
         city: "",
         state: "",
         pincode: ""
+
     })
 
+    // Handle Input Change
     const handleChange = (e) => {
+
         setCheckoutData({
+
             ...checkoutData,
+
             [e.target.name]: e.target.value
+
         })
 
     }
 
+    // Total Price
     const totalPrice = cartItems.reduce((total, item) => {
 
         return total + item.line_total
 
     }, 0)
 
+    // Place Order
     const handlePlaceOrder = async () => {
-        try {
-            const shippingAddress = `
-            ${checkoutData.fullname},
-            ${checkoutData.phone},
-            ${checkoutData.address},
-            ${checkoutData.city},
-            ${checkoutData.state} - ${checkoutData.pincode}`
 
-            console.log({
-                shipping_address: shippingAddress
-            })
+        // Validation
+        if (!checkoutData.fullname.trim()) {
+
+            toast.error("Full name is required")
+
+            return
+
+        }
+
+        if (!checkoutData.phone.trim()) {
+
+            toast.error("Phone number is required")
+
+            return
+
+        }
+
+        if (checkoutData.phone.length < 10) {
+
+            toast.error("Enter valid phone number")
+
+            return
+
+        }
+
+        if (!checkoutData.address.trim()) {
+
+            toast.error("Address is required")
+
+            return
+
+        }
+
+        if (!checkoutData.city.trim()) {
+
+            toast.error("City is required")
+
+            return
+
+        }
+
+        if (!checkoutData.state.trim()) {
+
+            toast.error("State is required")
+
+            return
+
+        }
+
+        if (!checkoutData.pincode.trim()) {
+
+            toast.error("Pincode is required")
+
+            return
+
+        }
+
+        if (checkoutData.pincode.length < 6) {
+
+            toast.error("Enter valid pincode")
+
+            return
+
+        }
+
+        try {
+
+            const shippingAddress = `
+                ${checkoutData.fullname},
+                ${checkoutData.phone},
+                ${checkoutData.address},
+                ${checkoutData.city},
+                ${checkoutData.state} - ${checkoutData.pincode}
+            `
 
             const res = await api.post("/orders/", {
+
                 shipping_address: shippingAddress
+
             })
-            navigate("/order-success")
+
             console.log(res.data)
+
+            toast.success("Order placed successfully")
+
+            navigate("/order-success")
+
         } catch (error) {
-            console.error(error);
+
+            console.error(error)
+
+            toast.error("Failed to place order")
+
         }
 
     }
 
     return (
 
-        <div className='max-w-6xl mx-auto p-6'>
+        <div className='bg-gray-50 min-h-screen py-6 md:py-10'>
 
-            <h1 className='text-3xl font-bold mb-8'>
-                Checkout
-            </h1>
+            <div className='max-w-7xl mx-auto px-4 md:px-6'>
 
-            <div className='grid md:grid-cols-2 gap-8'>
+                {/* Heading */}
+                <div className='mb-10'>
 
-                {/* Shipping Information */}
-                <div className='border rounded-xl p-6'>
+                    <p className='text-gray-500 mb-2'>
+                        Secure Checkout
+                    </p>
 
-                    <h2 className='text-2xl font-semibold mb-6'>
-                        Shipping Information
-                    </h2>
+                    <h1
+                        className='
+                            text-3xl
+                            sm:text-4xl
+                            md:text-5xl
+                            font-bold
+                            text-gray-900
+                        '
+                    >
+                        Checkout
+                    </h1>
 
-                    {/* Full Name */}
-                    <div className='mb-4'>
+                </div>
 
-                        <label className='block mb-2 font-medium'>
-                            Full Name
-                        </label>
+                <div
+                    className='
+                        grid
+                        grid-cols-1
+                        lg:grid-cols-3
+                        gap-8
+                    '
+                >
 
-                        <input
-                            type='text'
-                            name='fullname'
-                            value={checkoutData.fullname}
-                            onChange={handleChange}
-                            placeholder='Enter Your Full Name'
-                            className='w-full border rounded-lg p-3 outline-none focus:ring-2 focus:ring-blue-500'
-                        />
+                    {/* Shipping Information */}
+                    <div
+                        className='
+                            lg:col-span-2
+                            bg-white
+                            rounded-3xl
+                            border
+                            border-gray-100
+                            shadow-sm
+                            p-5
+                            sm:p-7
+                            lg:p-8
+                        '
+                    >
 
-                    </div>
+                        <h2
+                            className='
+                                text-2xl
+                                font-bold
+                                text-gray-900
+                                mb-8
+                            '
+                        >
+                            Shipping Information
+                        </h2>
 
-                    {/* Phone Number */}
-                    <div className='mb-4'>
+                        {/* Full Name */}
+                        <div className='mb-5'>
 
-                        <label className='block mb-2 font-medium'>
-                            Phone Number
-                        </label>
-
-                        <input
-                            type='text'
-                            name='phone'
-                            value={checkoutData.phone}
-                            onChange={handleChange}
-                            placeholder='Enter Your Phone Number'
-                            className='w-full border rounded-lg p-3 outline-none focus:ring-2 focus:ring-blue-500'
-                        />
-
-                    </div>
-
-                    {/* Address */}
-                    <div className='mb-4'>
-
-                        <label className='block mb-2 font-medium'>
-                            Address
-                        </label>
-
-                        <textarea
-                            placeholder='Enter your address'
-                            rows={4}
-                            name='address'
-                            value={checkoutData.address}
-                            onChange={handleChange}
-                            className='w-full border rounded-lg p-3 outline-none focus:ring-2 focus:ring-blue-500'
-                        />
-
-                    </div>
-
-                    {/* City */}
-                    <div className='mb-4'>
-
-                        <label className='block mb-2 font-medium'>
-                            City
-                        </label>
-
-                        <input
-                            type='text'
-                            placeholder='Enter your city'
-                            name='city'
-                            value={checkoutData.city}
-                            onChange={handleChange}
-                            className='w-full border rounded-lg p-3 outline-none focus:ring-2 focus:ring-blue-500'
-                        />
-
-                    </div>
-
-                    {/* State + Pincode */}
-                    <div className='grid grid-cols-2 gap-4 mb-4'>
-
-                        <div>
-
-                            <label className='block mb-2 font-medium'>
-                                State
+                            <label
+                                className='
+                                    block
+                                    mb-2
+                                    text-sm
+                                    font-medium
+                                    text-gray-700
+                                '
+                            >
+                                Full Name
                             </label>
 
                             <input
                                 type='text'
-                                placeholder='Enter state'
-                                name='state'
-                                value={checkoutData.state}
+                                name='fullname'
+                                value={checkoutData.fullname}
                                 onChange={handleChange}
-                                className='w-full border rounded-lg p-3 outline-none focus:ring-2 focus:ring-blue-500'
+                                placeholder='Enter your full name'
+                                className='
+                                    w-full
+                                    bg-gray-100
+                                    border
+                                    border-gray-200
+                                    rounded-2xl
+                                    px-5
+                                    py-4
+                                    outline-none
+                                    focus:ring-2
+                                    focus:ring-gray-300
+                                '
                             />
 
                         </div>
 
+                        {/* Phone */}
+                        <div className='mb-5'>
+
+                            <label
+                                className='
+                                    block
+                                    mb-2
+                                    text-sm
+                                    font-medium
+                                    text-gray-700
+                                '
+                            >
+                                Phone Number
+                            </label>
+
+                            <input
+                                type='text'
+                                name='phone'
+                                value={checkoutData.phone}
+                                onChange={handleChange}
+                                placeholder='Enter your phone number'
+                                className='
+                                    w-full
+                                    bg-gray-100
+                                    border
+                                    border-gray-200
+                                    rounded-2xl
+                                    px-5
+                                    py-4
+                                    outline-none
+                                    focus:ring-2
+                                    focus:ring-gray-300
+                                '
+                            />
+
+                        </div>
+
+                        {/* Address */}
+                        <div className='mb-5'>
+
+                            <label
+                                className='
+                                    block
+                                    mb-2
+                                    text-sm
+                                    font-medium
+                                    text-gray-700
+                                '
+                            >
+                                Address
+                            </label>
+
+                            <textarea
+                                rows={5}
+                                name='address'
+                                value={checkoutData.address}
+                                onChange={handleChange}
+                                placeholder='Enter your address'
+                                className='
+                                    w-full
+                                    bg-gray-100
+                                    border
+                                    border-gray-200
+                                    rounded-2xl
+                                    px-5
+                                    py-4
+                                    outline-none
+                                    focus:ring-2
+                                    focus:ring-gray-300
+                                    resize-none
+                                '
+                            />
+
+                        </div>
+
+                        {/* City + State */}
+                        <div
+                            className='
+                                grid
+                                grid-cols-1
+                                sm:grid-cols-2
+                                gap-5
+                                mb-5
+                            '
+                        >
+
+                            {/* City */}
+                            <div>
+
+                                <label
+                                    className='
+                                        block
+                                        mb-2
+                                        text-sm
+                                        font-medium
+                                        text-gray-700
+                                    '
+                                >
+                                    City
+                                </label>
+
+                                <input
+                                    type='text'
+                                    name='city'
+                                    value={checkoutData.city}
+                                    onChange={handleChange}
+                                    placeholder='Enter city'
+                                    className='
+                                        w-full
+                                        bg-gray-100
+                                        border
+                                        border-gray-200
+                                        rounded-2xl
+                                        px-5
+                                        py-4
+                                        outline-none
+                                        focus:ring-2
+                                        focus:ring-gray-300
+                                    '
+                                />
+
+                            </div>
+
+                            {/* State */}
+                            <div>
+
+                                <label
+                                    className='
+                                        block
+                                        mb-2
+                                        text-sm
+                                        font-medium
+                                        text-gray-700
+                                    '
+                                >
+                                    State
+                                </label>
+
+                                <input
+                                    type='text'
+                                    name='state'
+                                    value={checkoutData.state}
+                                    onChange={handleChange}
+                                    placeholder='Enter state'
+                                    className='
+                                        w-full
+                                        bg-gray-100
+                                        border
+                                        border-gray-200
+                                        rounded-2xl
+                                        px-5
+                                        py-4
+                                        outline-none
+                                        focus:ring-2
+                                        focus:ring-gray-300
+                                    '
+                                />
+
+                            </div>
+
+                        </div>
+
+                        {/* Pincode */}
                         <div>
 
-                            <label className='block mb-2 font-medium'>
+                            <label
+                                className='
+                                    block
+                                    mb-2
+                                    text-sm
+                                    font-medium
+                                    text-gray-700
+                                '
+                            >
                                 Pincode
                             </label>
 
                             <input
                                 type='text'
-                                placeholder='Enter pincode'
                                 name='pincode'
                                 value={checkoutData.pincode}
                                 onChange={handleChange}
-                                className='w-full border rounded-lg p-3 outline-none focus:ring-2 focus:ring-blue-500'
+                                placeholder='Enter pincode'
+                                className='
+                                    w-full
+                                    bg-gray-100
+                                    border
+                                    border-gray-200
+                                    rounded-2xl
+                                    px-5
+                                    py-4
+                                    outline-none
+                                    focus:ring-2
+                                    focus:ring-gray-300
+                                '
                             />
 
                         </div>
 
                     </div>
 
-                </div>
+                    {/* Order Summary */}
+                    <div
+                        className='
+                            bg-white
+                            rounded-3xl
+                            border
+                            border-gray-100
+                            shadow-sm
+                            p-6
+                            h-fit
+                            lg:sticky
+                            lg:top-28
+                        '
+                    >
 
-                {/* Order Summary */}
-                <div className='border rounded-xl p-6 h-fit'>
+                        <h2
+                            className='
+                                text-2xl
+                                font-bold
+                                text-gray-900
+                                mb-8
+                            '
+                        >
+                            Order Summary
+                        </h2>
 
-                    <h2 className='text-2xl font-semibold mb-6'>
-                        Order Summary
-                    </h2>
+                        {
 
-                    {
-                        cartItems.map((item) => (
+                            cartItems.map((item) => (
 
-                            <div
-                                key={item.id}
-                                className='flex justify-between items-center mb-4 border-b pb-3'
-                            >
+                                <div
+                                    key={item.id}
+                                    className='
+                                        flex
+                                        justify-between
+                                        items-center
+                                        border-b
+                                        border-gray-100
+                                        pb-4
+                                        mb-4
+                                    '
+                                >
 
-                                <div>
+                                    <div>
 
-                                    <h3 className='font-medium'>
-                                        {item.product_name}
-                                    </h3>
+                                        <h3
+                                            className='
+                                                font-semibold
+                                                text-gray-900
+                                            '
+                                        >
+                                            {item.product_name}
+                                        </h3>
 
-                                    <p className='text-sm text-gray-500'>
-                                        Quantity: {item.quantity}
+                                        <p
+                                            className='
+                                                text-sm
+                                                text-gray-500
+                                                mt-1
+                                            '
+                                        >
+                                            Quantity: {item.quantity}
+                                        </p>
+
+                                    </div>
+
+                                    <p
+                                        className='
+                                            font-bold
+                                            text-black
+                                        '
+                                    >
+                                        ₹ {item.line_total}
                                     </p>
 
                                 </div>
 
-                                <p className='font-semibold'>
-                                    ₹ {item.line_total}
+                            ))
+
+                        }
+
+                        {/* Total */}
+                        <div className='border-t border-gray-200 pt-6'>
+
+                            <div
+                                className='
+                                    flex
+                                    justify-between
+                                    items-center
+                                '
+                            >
+
+                                <h3
+                                    className='
+                                        text-xl
+                                        font-bold
+                                        text-gray-900
+                                    '
+                                >
+                                    Total
+                                </h3>
+
+                                <p
+                                    className='
+                                        text-2xl
+                                        font-bold
+                                        text-black
+                                    '
+                                >
+                                    ₹ {totalPrice}
                                 </p>
 
                             </div>
 
-                        ))
-                    }
+                        </div>
 
-                    {/* Total */}
-                    <div className='flex justify-between items-center mt-6 pt-4 border-t'>
-
-                        <h3 className='text-xl font-bold'>
-                            Total
-                        </h3>
-
-                        <p className='text-xl font-bold text-blue-600'>
-                            ₹ {totalPrice}
-                        </p>
+                        {/* Button */}
+                        <button
+                            onClick={handlePlaceOrder}
+                            className='
+                                w-full
+                                mt-8
+                                bg-black
+                                text-white
+                                py-4
+                                rounded-2xl
+                                font-medium
+                                hover:bg-gray-800
+                                transition-all
+                            '
+                        >
+                            Place Order
+                        </button>
 
                     </div>
-                    <button
-                        onClick={handlePlaceOrder}
-                        className='w-full mt-6 bg-black text-white py-3 rounded-lg hover:bg-gray-800 transition cursor-pointer'
-                    >
-                        Place Order </button>
 
                 </div>
 

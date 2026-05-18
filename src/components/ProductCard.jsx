@@ -1,113 +1,118 @@
-import React, { useContext } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { CartContext } from '../context/CartContext'
-import { AuthContext } from '../context/AuthContext'
+import React from 'react'
+import { Link } from 'react-router-dom'
 
 const ProductCard = ({ product }) => {
 
-    const navigate = useNavigate();
-
-    const { addToCart } = useContext(CartContext);
-
-    const { isAuthenticated } = useContext(AuthContext);
-
-    const handleAddToCart = async (e) => {
-
-        // Prevent Product Navigation
-        e.stopPropagation();
-
-        // Redirect if not logged in
-        if (!isAuthenticated) {
-
-            navigate("/signin");
-
-            return;
-
-        }
-
-        // Add Product To Cart
-        await addToCart(product.id, 1);
-
-    };
-
     return (
 
-        <div
-            onClick={() => navigate(`/product/${product.slug}`)}
-            className='
-                w-full
-                cursor-pointer
-                bg-white
-                rounded-xl
-                overflow-hidden
-                shadow-sm
-                hover:shadow-lg
-                transition-all
-                duration-300
-                border
-                border-gray-100
-            '
+        <Link
+            to={`/product/${product.slug}`}
+            className='group'
         >
 
-            {/* Image Wrapper */}
             <div
                 className='
-                    w-full
-                    h-72
                     bg-white
+                    rounded-3xl
                     overflow-hidden
-                    flex
-                    items-center
-                    justify-center
-                    p-4
+                    border
+                    border-gray-100
+                    shadow-sm
+                    hover:shadow-xl
+                    hover:-translate-y-1
+                    transition-all
+                    duration-300
                 '
             >
 
-                <img
-                    src={product.images[0]?.image}
-                    alt={product.name}
+                {/* Image Container */}
+                <div
                     className='
-                        w-full
-                        h-full
-                        object-contain
-                    '
-                />
-
-            </div>
-
-            {/* Details Section */}
-            <div className='p-4'>
-
-                {/* Product Name */}
-                <h2 className='text-lg font-semibold text-gray-800 line-clamp-2 min-h-[56px]'>
-                    {product.name}
-                </h2>
-
-                {/* Product Price */}
-                <p className='text-blue-600 text-xl font-bold mt-2'>
-                    ₹ {product.price}
-                </p>
-
-                {/* Add To Cart Button */}
-                <button
-                    onClick={handleAddToCart}
-                    className='
-                        w-full
-                        mt-4
-                        bg-blue-600
-                        text-white
-                        py-2
-                        rounded-lg
-                        hover:bg-blue-700
-                        transition
+                        bg-gray-100
+                        p-8
+                        overflow-hidden
                     '
                 >
-                    Add To Cart
-                </button>
+
+                    <img
+                        src={product.images[0]?.image}
+                        alt={product.name}
+                        loading="lazy"
+                        className='
+                            w-full
+                            h-64
+                            object-contain
+                            transition-transform
+                            duration-500
+                            group-hover:scale-105
+                        '
+                    />
+
+                </div>
+
+                {/* Content */}
+                <div className='p-6'>
+
+                    {/* Category */}
+                    <p
+                        className='
+                            text-sm
+                            text-gray-500
+                            mb-2
+                        '
+                    >
+                        {product.category_name}
+                    </p>
+
+                    {/* Product Name */}
+                    <h2
+                        className='
+                            text-lg
+                            font-semibold
+                            text-gray-900
+                            line-clamp-2
+                            min-h-[56px]
+                        '
+                    >
+                        {product.name}
+                    </h2>
+
+                    {/* Price */}
+                    <div className='mt-4 mb-5'>
+
+                        <p
+                            className='
+                                text-2xl
+                                font-bold
+                                text-black
+                            '
+                        >
+                            ₹ {product.price}
+                        </p>
+
+                    </div>
+
+                    {/* Button */}
+                    <button
+                        className='
+                            w-full
+                            bg-black
+                            text-white
+                            py-3
+                            rounded-2xl
+                            font-medium
+                            hover:bg-gray-800
+                            transition-all
+                        '
+                    >
+                        View Product
+                    </button>
+
+                </div>
 
             </div>
 
-        </div>
+        </Link>
 
     )
 

@@ -1,94 +1,223 @@
-import React, { useContext, useState } from 'react'
+import React, {
+    useContext,
+    useState,
+    useEffect,
+    useRef
+} from 'react'
+
 import { AuthContext } from '../context/AuthContext'
 import { Link, useNavigate } from 'react-router-dom'
 import { CartContext } from '../context/CartContext'
 
-const Navbar = ({searchQuery,setSearchQuery}) => {
+const Navbar = ({ searchQuery, setSearchQuery }) => {
 
-    const { isAuthenticated, logout } = useContext(AuthContext)
+    const { isAuthenticated, logout } =
+        useContext(AuthContext)
 
-    const [isMenuOpen, setIsMenuOpen] = useState(false)
-    const [isProfileOpen, setIsProfileOpen] = useState(false)
+    const { cartItems } =
+        useContext(CartContext)
 
     const navigate = useNavigate()
-    const {cartItems}=useContext(CartContext)
+
+    const [isMenuOpen, setIsMenuOpen] =
+        useState(false)
+
+    const [isProfileOpen, setIsProfileOpen] =
+        useState(false)
+
+    // Dropdown Ref
+    const dropdownRef = useRef(null)
+
+    // Close On Outside Click
+    useEffect(() => {
+
+        const handleClickOutside = (event) => {
+
+            if (
+
+                dropdownRef.current &&
+
+                !dropdownRef.current.contains(event.target)
+
+            ) {
+
+                setIsProfileOpen(false)
+
+            }
+
+        }
+
+        document.addEventListener(
+            "mousedown",
+            handleClickOutside
+        )
+
+        return () => {
+
+            document.removeEventListener(
+                "mousedown",
+                handleClickOutside
+            )
+
+        }
+
+    }, [])
 
     const handleLogout = () => {
 
         logout()
+
+        setIsProfileOpen(false)
+
         navigate("/")
 
     }
 
-    const cartCount=cartItems.reduce((acc,item)=> acc+item.quantity,0)
+    const cartCount = cartItems.reduce(
+
+        (acc, item) => acc + item.quantity,
+
+        0
+
+    )
+
     return (
 
         <>
 
             {/* Navbar */}
-            <nav className='bg-blue-600 shadow-md sticky top-0 z-50'>
+            <nav
+                className='
+                    sticky
+                    top-0
+                    z-50
+                    bg-white/80
+                    backdrop-blur-md
+                    border-b
+                    border-gray-200
+                '
+            >
 
-                {/* Full Width Container */}
-                <div className='w-full px-6 lg:px-10'>
+                <div className='max-w-7xl mx-auto px-4 md:px-6'>
 
-                    {/* Navbar Row */}
-                    <div className='flex items-center justify-between h-16'>
+                    <div
+                        className='
+                            flex
+                            items-center
+                            justify-between
+                            h-20
+                        '
+                    >
 
-                        {/* Logo Section */}
-                        <div className='flex items-center gap-3'>
+                        {/* Logo */}
+                        <div
+                            className='
+                                flex
+                                items-center
+                                gap-3
+                                shrink-0
+                            '
+                        >
 
                             <img
                                 src='/logo.png'
                                 alt='Swiftly'
-                                className='w-10 h-10 rounded object-cover'
+                                className='
+                                    w-10
+                                    h-10
+                                    rounded-xl
+                                    object-cover
+                                '
                             />
 
-                            <h1 className='text-white text-2xl font-bold tracking-wide'>
+                            <h1
+                                className='
+                                    text-gray-900
+                                    text-2xl
+                                    font-bold
+                                    tracking-tight
+                                '
+                            >
                                 Swiftly
                             </h1>
 
                         </div>
 
-                        {/* Desktop Section */}
-                        <div className='hidden md:flex items-center gap-6 flex-1 justify-between mx-10'>
+                        {/* Desktop */}
+                        <div
+                            className='
+                                hidden
+                                md:flex
+                                items-center
+                                flex-1
+                                justify-between
+                                mx-10
+                                gap-8
+                            '
+                        >
 
-                            {/* Search Bar */}
+                            {/* Search */}
                             <div className='w-full max-w-2xl'>
 
                                 <input
                                     type='text'
                                     placeholder='Search products...'
                                     value={searchQuery}
-                                    onChange={(e)=>setSearchQuery(e.target.value)}
+                                    onChange={(e) =>
+                                        setSearchQuery(
+                                            e.target.value
+                                        )
+                                    }
                                     className='
                                         w-full
-                                        px-4
-                                        py-2
-                                        rounded-lg
+                                        bg-gray-100
+                                        border
+                                        border-gray-200
+                                        rounded-2xl
+                                        px-5
+                                        py-3
+                                        text-sm
+                                        text-gray-700
+                                        placeholder:text-gray-400
                                         outline-none
-                                        border-none
-                                        text-black
-                                        bg-white
                                         focus:ring-2
-                                        focus:ring-blue-300
+                                        focus:ring-gray-300
+                                        transition-all
                                     '
                                 />
 
                             </div>
 
-                            {/* Navigation Links */}
-                            <div className='flex items-center gap-6'>
+                            {/* Links */}
+                            <div
+                                className='
+                                    flex
+                                    items-center
+                                    gap-6
+                                    shrink-0
+                                '
+                            >
 
                                 <Link
                                     to="/"
-                                    className='text-white font-medium hover:text-gray-200 transition'
+                                    className='
+                                        text-gray-700
+                                        font-medium
+                                        hover:text-black
+                                        transition
+                                    '
                                 >
                                     Home
                                 </Link>
 
                                 <Link
-                                    to="/cart" 
-                                    className='text-white font-medium hover:text-gray-200 transition'
+                                    to="/cart"
+                                    className='
+                                        text-gray-700
+                                        font-medium
+                                        hover:text-black
+                                        transition
+                                    '
                                 >
                                     Cart ({cartCount})
                                 </Link>
@@ -97,61 +226,112 @@ const Navbar = ({searchQuery,setSearchQuery}) => {
 
                         </div>
 
-                        {/* Desktop Right Section */}
+                        {/* Right Section */}
                         <div className='hidden md:block'>
 
                             {
 
                                 isAuthenticated ? (
 
-                                    <div className='relative'>
+                                    <div
+                                        className='relative'
+                                        ref={dropdownRef}
+                                    >
 
+                                        {/* Profile Button */}
                                         <button
-                                            onClick={() => setIsProfileOpen(!isProfileOpen)}
+                                            onClick={() =>
+                                                setIsProfileOpen(
+                                                    !isProfileOpen
+                                                )
+                                            }
                                             className='
-                                                bg-white
-                                                text-blue-600
-                                                px-3
-                                                py-2
-                                                rounded-lg
-                                                hover:bg-gray-100
+                                                w-11
+                                                h-11
+                                                rounded-full
+                                                bg-gray-100
+                                                hover:bg-gray-200
+                                                flex
+                                                items-center
+                                                justify-center
                                                 transition
+                                                text-lg
                                                 cursor-pointer
                                             '
                                         >
                                             👤
                                         </button>
 
+                                        {/* Dropdown */}
                                         {
 
                                             isProfileOpen && (
 
-                                                <div className='absolute right-0 mt-3 w-56 bg-white rounded-xl shadow-xl p-2 flex flex-col gap-1'>
+                                                <div
+                                                    className='
+                                                        absolute
+                                                        right-0
+                                                        mt-3
+                                                        w-60
+                                                        bg-white
+                                                        border
+                                                        border-gray-100
+                                                        rounded-2xl
+                                                        shadow-lg
+                                                        p-2
+                                                        flex
+                                                        flex-col
+                                                        gap-1
+                                                    '
+                                                >
 
                                                     <Link
                                                         to="/orders"
-                                                        className='hover:bg-gray-100 px-4 py-2 rounded-lg transition'
+                                                        onClick={() =>
+                                                            setIsProfileOpen(false)
+                                                        }
+                                                        className='
+                                                            hover:bg-gray-100
+                                                            px-4
+                                                            py-3
+                                                            rounded-xl
+                                                            transition
+                                                            text-gray-700
+                                                        '
                                                     >
                                                         My Orders
                                                     </Link>
 
                                                     <Link
                                                         to="/profile"
-                                                        className='hover:bg-gray-100 px-4 py-2 rounded-lg transition'
+                                                        onClick={() =>
+                                                            setIsProfileOpen(false)
+                                                        }
+                                                        className='
+                                                            hover:bg-gray-100
+                                                            px-4
+                                                            py-3
+                                                            rounded-xl
+                                                            transition
+                                                            text-gray-700
+                                                        '
                                                     >
                                                         Profile
                                                     </Link>
 
                                                     <Link
-                                                        to="/address"
-                                                        className='hover:bg-gray-100 px-4 py-2 rounded-lg transition'
-                                                    >
-                                                        Address
-                                                    </Link>
-
-                                                    <Link
                                                         to="/change-password"
-                                                        className='hover:bg-gray-100 px-4 py-2 rounded-lg transition'
+                                                        onClick={() =>
+                                                            setIsProfileOpen(false)
+                                                        }
+                                                        className='
+                                                            hover:bg-gray-100
+                                                            px-4
+                                                            py-3
+                                                            rounded-xl
+                                                            transition
+                                                            text-gray-700
+                                                        '
                                                     >
                                                         Change Password
                                                     </Link>
@@ -163,8 +343,8 @@ const Navbar = ({searchQuery,setSearchQuery}) => {
                                                             text-red-500
                                                             hover:bg-red-50
                                                             px-4
-                                                            py-2
-                                                            rounded-lg
+                                                            py-3
+                                                            rounded-xl
                                                             transition
                                                         '
                                                     >
@@ -184,13 +364,13 @@ const Navbar = ({searchQuery,setSearchQuery}) => {
                                     <Link
                                         to="/signin"
                                         className='
-                                            bg-white
-                                            text-blue-600
-                                            px-4
-                                            py-2
-                                            rounded-lg
+                                            bg-black
+                                            text-white
+                                            px-5
+                                            py-2.5
+                                            rounded-xl
                                             font-medium
-                                            hover:bg-gray-100
+                                            hover:bg-gray-800
                                             transition
                                         '
                                     >
@@ -203,10 +383,12 @@ const Navbar = ({searchQuery,setSearchQuery}) => {
 
                         </div>
 
-                        {/* Mobile Menu Button */}
+                        {/* Mobile Button */}
                         <button
-                            className='md:hidden text-white text-3xl'
-                            onClick={() => setIsMenuOpen(!isMenuOpen)}
+                            className='md:hidden text-3xl text-gray-800'
+                            onClick={() =>
+                                setIsMenuOpen(!isMenuOpen)
+                            }
                         >
                             {isMenuOpen ? "✕" : "☰"}
                         </button>
@@ -216,138 +398,6 @@ const Navbar = ({searchQuery,setSearchQuery}) => {
                 </div>
 
             </nav>
-
-            {/* Mobile Menu */}
-            {
-
-                isMenuOpen && (
-
-                    <div className='md:hidden bg-blue-600 px-4 pb-5 shadow-lg'>
-
-                        <div className='flex flex-col gap-4'>
-
-                            {/* Search */}
-                            <input
-                                type="text"
-                                placeholder="Search products..."
-                                value={searchQuery}
-                                onChange={(e)=> setSearchQuery(e.target.value)}
-                                className='
-                                    w-full
-                                    px-4
-                                    py-3
-                                    rounded-lg
-                                    outline-none
-                                    text-black
-                                    bg-white
-                                '
-                            />
-
-                            {/* Navigation */}
-                            <Link
-                                to="/"
-                                className='
-                                    bg-white
-                                    text-blue-600
-                                    py-3
-                                    rounded-lg
-                                    text-center
-                                    font-medium
-                                '
-                            >
-                                Home
-                            </Link>
-
-                            <Link
-                                to="/cart"
-                                className='
-                                    bg-white
-                                    text-blue-600
-                                    py-3
-                                    rounded-lg
-                                    text-center
-                                    font-medium
-                                '
-                            >
-                                Cart ({cartCount})
-                            </Link>
-
-                            {
-
-                                isAuthenticated ? (
-
-                                    <>
-
-                                        <Link
-                                            to="/orders"
-                                            className='bg-white text-blue-600 py-3 rounded-lg text-center font-medium'
-                                        >
-                                            My Orders
-                                        </Link>
-
-                                        <Link
-                                            to="/profile"
-                                            className='bg-white text-blue-600 py-3 rounded-lg text-center font-medium'
-                                        >
-                                            Profile
-                                        </Link>
-
-                                        <Link
-                                            to="/address"
-                                            className='bg-white text-blue-600 py-3 rounded-lg text-center font-medium'
-                                        >
-                                            Address
-                                        </Link>
-
-                                        <Link
-                                            to="/change-password"
-                                            className='bg-white text-blue-600 py-3 rounded-lg text-center font-medium'
-                                        >
-                                            Change Password
-                                        </Link>
-
-                                        <button
-                                            onClick={handleLogout}
-                                            className='
-                                                bg-red-500
-                                                text-white
-                                                py-3
-                                                rounded-lg
-                                                font-medium
-                                            '
-                                        >
-                                            Logout
-                                        </button>
-
-                                    </>
-
-                                ) : (
-
-                                    <Link
-                                        to="/signin"
-                                        className='
-                                            bg-white
-                                            text-blue-600
-                                            py-3
-                                            rounded-lg
-                                            text-center
-                                            font-medium
-                                        '
-                                    >
-                                        Login
-                                    </Link>
-
-                                )
-
-                            }
-
-                        </div>
-
-                    </div>
-
-                )
-
-            }
 
         </>
 
